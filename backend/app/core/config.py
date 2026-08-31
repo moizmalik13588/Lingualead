@@ -6,6 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/lingualead"
     VAPI_API_KEY: str = ""
+    VAPI_ASSISTANT_ID: str = ""
     VAPI_PHONE_NUMBER_ID: str = ""
     VAPI_WEBHOOK_SECRET: str = ""
     TWILIO_ACCOUNT_SID: str = ""

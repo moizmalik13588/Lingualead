@@ -1,0 +1,17 @@
+{
+  "message": {
+    "type": "end-of-call-report",
+    "call": {
+      "id": "call-urdu-888",
+      "type": "inbound",
+      "status": "ended",
+      "customer": {
+        "number": "+923009876543",
+        "name": "Ahmed Raza"
+      },
+      "durationSeconds": 82,
+      "transcript": "AI Agent: Hello! Welcome to LinguaLead. English mein baat karein ya Urdu mein? Ahmed Raza: Bhai Urdu mein baat karte hain. Mujhe apni auto parts shop ke liye AI receptionist chahiye jo calls attend kare. Budget takreeban 50 hazaar rupay mahina hai aur hum agle hafte shuru karna chahte hain.",
+      "summary": "Ahmed Raza interested in AI receptionist for auto parts shop in Urdu, budget 50k PKR/month, timeline next week."
+    }
+  }
+}

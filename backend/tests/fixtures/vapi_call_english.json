@@ -1,0 +1,17 @@
+{
+  "message": {
+    "type": "end-of-call-report",
+    "call": {
+      "id": "call-eng-999",
+      "type": "inbound",
+      "status": "ended",
+      "customer": {
+        "number": "+14155552671",
+        "name": "Sarah Jenkins"
+      },
+      "durationSeconds": 65,
+      "transcript": "AI Agent: Hello! Welcome to LinguaLead. English mein baat karein ya Urdu mein? Sarah: Hi, I'd like to speak in English. I'm interested in your AI voice calling agent for our real estate business. We need it to handle inbound leads. Budget is around $2,000 a month and we want to deploy it within the next two weeks.",
+      "summary": "Sarah Jenkins interested in AI voice calling agent for real estate business with $2k/month budget and 2-week timeline."
+    }
+  }
+}

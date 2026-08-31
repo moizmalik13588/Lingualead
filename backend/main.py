@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.routes.vapi import router as vapi_router
 from app.api.routes.crm import router as crm_router
+from app.api.routes.demo import router as demo_router
 
 app = FastAPI(
     title="LinguaLead API",
@@ -25,6 +26,7 @@ app.add_middleware(
 # Include Routers
 app.include_router(vapi_router)
 app.include_router(crm_router)
+app.include_router(demo_router)
 
 
 @app.get("/api/health", tags=["Health"])

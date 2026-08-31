@@ -48,39 +48,15 @@ export async function updateFollowUp(id: number, completed: boolean): Promise<Fo
   return res.json();
 }
 
-export async function simulateWebhook(fixtureName: string): Promise<any> {
-  // We can trigger simulation via backend or send a mock payload to /api/vapi/webhook
-  const payload = fixtureName === 'urdu' 
-    ? {
-        message: {
-          type: 'end-of-call-report',
-          call: {
-            id: `call-demo-${Date.now()}`,
-            customer: { number: '+923005554433', name: 'Bilal Ahmed' },
-            durationSeconds: 72,
-            transcript: "AI Agent: Hello! Welcome to LinguaLead. English mein baat karein ya Urdu mein? Bilal: Urdu mein baat karte hain. Mujhe software development outsourced karni hai apni company ke liye. Budget around 300k PKR hai aur timeline next month hai.",
-            summary: "Bilal Ahmed wants software development services in Urdu. Budget 300k PKR, timeline next month."
-          }
-        }
-      }
-    : {
-        message: {
-          type: 'end-of-call-report',
-          call: {
-            id: `call-demo-${Date.now()}`,
-            customer: { number: '+14155559988', name: 'Jessica Taylor' },
-            durationSeconds: 58,
-            transcript: "AI Agent: Hello! Welcome to LinguaLead. English mein baat karein ya Urdu mein? Jessica: Hi, English. We are looking for an AI voice sales agent for our e-commerce store. Very interested, budget is $5,000, need it by end of week.",
-            summary: "Jessica Taylor interested in AI voice sales agent for e-commerce store. Budget $5k, urgent timeline end of week."
-          }
-        }
-      };
-
-  const res = await fetch(`${API_BASE}/vapi/webhook`, {
+export async function simulateWebhook(language: string): Promise<any> {
+  const res = await fetch(`${API_BASE}/demo/simulate-call`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ language }),
   });
-  if (!res.ok) throw new Error('Failed to simulate webhook');
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.detail || 'Failed to simulate call');
+  }
   return res.json();
 }

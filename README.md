@@ -1,153 +1,184 @@
-# LinguaLead
+<div align="center">
 
-> **LinguaLead** is a bilingual AI voice sales agent that automatically turns phone conversations into qualified CRM leads and follow-up actions.
+# 🎙️ LinguaLead
 
-## 💼 Business Value
-Sales and service teams lose high-intent leads due to slow response times and language barriers in bilingual markets (English & Urdu/Hindi). LinguaLead acts as an autonomous 24/7 bilingual voice sales agent powered by Vapi.ai and Groq LLM. It engages callers naturally in Urdu or English, extracts structured qualification data (Interest, Budget, Timeline, Qualification Score), and syncs qualified leads directly to the CRM with automated follow-up scheduling.
+### Bilingual AI Voice Sales Agent + CRM Automation
+
+**Turning phone conversations into qualified CRM leads — in Urdu or English, automatically.**
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Frontend-8b5cf6?style=for-the-badge)](https://lingualead.vercel.app/)
+[![API Docs](https://img.shields.io/badge/API%20Docs-Swagger-009688?style=for-the-badge)](https://stellar-motivation-production-f6af.up.railway.app/docs)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](#-license)
+
+[**🔗 Live Demo**](https://lingualead.vercel.app/) · [**📖 API Docs**](https://stellar-motivation-production-f6af.up.railway.app/docs) · [**🐛 Report an Issue**](../../issues)
+
+</div>
+
+---
+
+## 💼 The Problem
+
+Sales and service teams lose high-intent leads every day because of slow response times and language barriers in bilingual markets like Pakistan (English & Urdu). A missed call at 2 AM, or a caller who's more comfortable in Urdu than English, often means a lost customer.
+
+## 💡 The Solution
+
+**LinguaLead** is an autonomous, 24/7 bilingual voice sales agent powered by **Vapi.ai** and **Groq LLM**. It:
+
+- 📞 Answers inbound calls and converses naturally in **Urdu or English**
+- 🧠 Extracts structured lead data — interest, budget, timeline, and a qualification score
+- 🔥 Automatically classifies leads as **Hot / Warm / Cold**
+- 📋 Syncs everything to a CRM dashboard in real time
+- ⏰ Auto-schedules follow-ups for promising leads — no human ever has to remember
+
+No missed leads. No language barrier. No manual data entry.
+
+---
+
+## 🖥️ See It In Action
+
+Visit the **[live dashboard](https://lingualead.vercel.app/)** to explore:
+
+- **Dashboard** — real-time stats, an AI Assistant insights panel, and a hot-lead pipeline ratio
+- **Leads CRM** — filterable, searchable lead list with bilingual call history
+- **AI Voice Demo Simulator** — trigger a simulated English or Urdu call and watch it flow through the full AI → CRM pipeline live, no real phone call needed
 
 ---
 
 ## 🏛️ Architecture & Workflow
+
 ```
-[Customer Call] 
-       │
-       ▼
- [Vapi.ai Voice Agent] (Bilingual Urdu/English)
-       │
-       ▼ (Webhook / Call Completed)
- [FastAPI Backend] (Signature Verification & Idempotency)
-       │
-       ▼
- [Groq LLM / Structured Output] (Pydantic Validation)
-       │
-       ▼
- [PostgreSQL CRM + SQLAlchemy & Alembic]
-       │
-       ▼
- [React + Vite + Tailwind Dashboard]
+   Customer Call
+        │
+        ▼
+ Vapi.ai Voice Agent  ──────────  Bilingual (Urdu / English) conversation
+        │
+        ▼  webhook: call completed
+ FastAPI Backend  ─────────────  Signature verification + idempotency check
+        │
+        ▼
+ Groq LLM (Structured Output)  ─  Pydantic-validated extraction
+        │
+        ▼
+ PostgreSQL CRM  ──────────────  SQLAlchemy + Alembic
+        │
+        ▼
+ React + Vite + Tailwind  ─────  Live dashboard
 ```
+
+**Deployment:** React frontend on Vercel (with a rewrite proxy to the backend), FastAPI backend on Railway, PostgreSQL on Railway.
 
 ---
 
 ## 🛡️ AI Safety & Guardrails
 
-LinguaLead is engineered with production-minded guardrails to ensure robust, secure, and predictable operation:
+LinguaLead is built with production-minded guardrails, not just a happy-path demo:
 
-1. **Voice Agent Prompt Guardrails**:
-   - **Role Discipline**: Strictly operates as a sales lead-qualification agent and refuses out-of-scope queries.
-   - **Confidentiality & Prompt Injection Defense**: Never reveals system prompts, internal instructions, or API secrets, and ignores caller attempts to override instructions via voice input.
-   - **Policy & Pricing Boundaries**: Never makes unauthorized commitments regarding pricing, discounts, refunds, or contracts, deferring these to human sales reps.
-   - **Minimal PII & Accuracy**: Collects only lead-qualification data (Name, Interest, Budget, Timeline) and defers uncertain details to human follow-up rather than hallucinating answers.
-   - **Abuse & Handoff**: Gracefully handles spam or abusive calls and provides natural human handoff lines.
+**Voice agent**
+- Stays strictly within its role as a lead-qualification agent; refuses out-of-scope requests
+- Never reveals system prompts, instructions, or API secrets — and ignores caller attempts to override its instructions
+- Makes no unauthorized commitments on pricing, discounts, or contracts — defers these to a human
+- Collects only the minimum data needed (name, interest, budget, timeline); defers uncertain answers to human follow-up instead of guessing
+- Handles abusive or spam calls gracefully with a natural human hand-off
 
-2. **LLM & Automation Layer Guardrails**:
-   - **Untrusted Input Handling**: Treats call transcripts as untrusted input; embedded transcript instructions cannot alter CRM logic or prompt state.
-   - **Pydantic Schema Validation**: Every structured extraction from Groq LLM is strictly validated against Pydantic models before touching the database.
-   - **Fallback / "Needs Review" Rescue**: If LLM extraction or parsing fails, the raw call is saved securely with a review flag to prevent system crashes or unvalidated data pollution.
-   - **Transcript vs Inference Separation**: Clearly distinguishes raw caller speech (`transcript`) from AI-inferred insights (`summary`, `qualification_score`).
+**LLM & automation layer**
+- Treats call transcripts as **untrusted input** — instructions embedded in a transcript can never override system logic
+- Every structured extraction is validated against a Pydantic schema before it touches the database
+- Failed extractions are never discarded — the raw call is saved with a "needs review" flag instead
+- Clearly separates what the caller actually said (`transcript`) from what the AI inferred (`summary`, `qualification_score`)
 
-3. **Backend Security & Reliability**:
-   - **Webhook Signature Verification**: Cryptographically verifies all incoming Vapi webhooks using shared secrets.
-   - **Idempotency**: Prevents duplicate webhook processing using unique Vapi call IDs (`vapi_call_id`).
-   - **Rate Limiting**: Built-in rate limiting prevents API endpoint abuse.
-   - **Secure Secret Management**: All credentials (API keys, webhook secrets, DB URLs) remain strictly server-side via `pydantic-settings`.
-   - **Structured Logging**: Comprehensive event logging (webhooks received, validation results, CRM syncs, and errors) for debugging and auditing.
-
----
-- **Backend**: FastAPI (Python 3.11+), SQLAlchemy 2.0, Alembic, Pydantic Settings, Uvicorn
-- **Database**: PostgreSQL
-- **AI / Voice**: Vapi.ai (Voice Calling / Webhooks), Groq (LLM Inference), Twilio (Telephony)
-- **Frontend**: React 19, Vite, Tailwind CSS
-- **Environment**: pydantic-settings, python-dotenv, httpx
+**Backend**
+- Cryptographic webhook signature verification on every incoming Vapi event
+- Idempotency checks (via `vapi_call_id`) prevent duplicate processing
+- Rate limiting on public and webhook endpoints
+- All secrets (API keys, DB URLs) stay server-side via `pydantic-settings` — never exposed to the frontend
+- Structured logging across webhook handling, validation, and CRM syncs for debugging and auditing
 
 ---
 
-## 🚀 Local Setup & Installation
+## 🧰 Tech Stack
 
-### 1. Prerequisites
-- Python 3.11+ installed
-- Node.js & npm installed
-- PostgreSQL running locally or accessible via connection string
+| Layer | Technology |
+|---|---|
+| **Backend** | FastAPI (Python 3.11+), SQLAlchemy 2.0, Alembic, Pydantic Settings, Uvicorn |
+| **Database** | PostgreSQL |
+| **AI / Voice** | Vapi.ai (voice + webhooks), Groq (LLM inference), Twilio (telephony) |
+| **Frontend** | React 19, Vite, Tailwind CSS |
+| **Hosting** | Vercel (frontend), Railway (backend + database) |
 
-### 2. Environment Configuration
-Copy `.env.example` to `.env` in the root directory and configure your credentials:
+---
+
+## 🚀 Local Setup
+
+### Prerequisites
+- Python 3.11+
+- Node.js & npm
+- PostgreSQL (local or remote)
+
+### 1. Clone and configure environment
 ```bash
-cp .env.example .env
+git clone https://github.com/moizmalik13588/Lingualead.git
+cd Lingualead
+cp backend/.env.example backend/.env
 ```
-Fill in your database URL and API keys (`VAPI_API_KEY`, `GROQ_API_KEY`, etc.).
+Fill in your database URL and API keys (`VAPI_API_KEY`, `GROQ_API_KEY`, etc.) in `backend/.env`.
 
-### 3. Backend Setup
-Navigate to the `backend` directory, set up virtual environment, install dependencies, and run database migrations:
+### 2. Backend setup
 ```bash
 cd backend
 python -m venv .venv
-# On Windows:
+
+# Windows
 .venv\Scripts\activate
-# On Unix/macOS:
-# source .venv/bin/activate
+# macOS/Linux
+source .venv/bin/activate
 
 pip install -r requirements.txt
-```
-
-### 4. Database Migrations (Alembic)
-Ensure PostgreSQL is running and the database is created (`lingualead`). Run migrations:
-```bash
 alembic upgrade head
-```
-
-### 5. Running the Backend Server
-```bash
 python main.py
 ```
-The FastAPI server will start on `http://localhost:8000`.
-- **API Docs (Swagger)**: Explore available endpoints at `http://localhost:8000/docs`
-- **Health Check**: `GET http://localhost:8000/api/health`
+The API runs at `http://localhost:8000`.
+- Swagger docs: `http://localhost:8000/docs`
+- Health check: `GET http://localhost:8000/api/health`
 
-### 6. Local Webhook Testing with ngrok (for Real Vapi Calls)
-Since Vapi's servers cannot reach `localhost:8000` directly, you need a tunnel like ngrok to test live Vapi webhooks locally:
-1. **Install ngrok** (if not already installed):
-   - Via Windows Package Manager:
-     ```bash
-     winget install ngrok.ngrok
-     ```
-   - Or download directly from [ngrok.com/download](https://ngrok.com/download).
-2. **Expose your local FastAPI backend**:
-   ```bash
-   ngrok http 8000
-   ```
-3. **Configure Vapi Assistant Webhook**:
-   - Copy the HTTPS forwarding URL generated by ngrok (e.g., `https://xxxx.ngrok-free.app`).
-   - Update your Vapi assistant settings / dashboard webhook URL to:
-     `<ngrok-url>/api/vapi/webhook`
-   - *Note*: Free tier ngrok URLs change every time ngrok is restarted, so you will need to update the webhook URL in Vapi if you restart ngrok.
-
-### 7. Frontend Setup
-Navigate to the `frontend` directory and start the development server:
+### 3. Frontend setup
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-The frontend will start on `http://localhost:5173`.
+The app runs at `http://localhost:5173`.
+
+### 4. Testing real Vapi calls locally (ngrok)
+Vapi's servers can't reach `localhost`, so you'll need a tunnel:
+```bash
+ngrok http 8000
+```
+Copy the HTTPS forwarding URL and set it as your Vapi assistant's webhook:
+```
+<ngrok-url>/api/vapi/webhook
+```
+> Free-tier ngrok URLs change on every restart — update the webhook URL in Vapi's dashboard each time.
 
 ---
 
 ## 📂 Project Structure
+
 ```
 Lingualead/
 ├── backend/
 │   ├── alembic/            # Database migrations
 │   ├── app/
-│   │   ├── api/            # API routes and dependencies
+│   │   ├── api/            # Routes and dependencies
 │   │   ├── core/           # Config and database setup
 │   │   ├── models/         # SQLAlchemy models (Lead, Call, FollowUp)
 │   │   ├── schemas/        # Pydantic validation schemas
 │   │   ├── services/       # Business logic (Vapi, Groq, CRM)
-│   │   └── utils/          # Utilities
+│   │   └── utils/
+│   ├── scripts/            # Seed data, backfills, one-off utilities
 │   └── main.py             # FastAPI entrypoint
 ├── frontend/
 │   ├── src/                # React components & pages
-│   ├── package.json
+│   ├── vercel.json         # Proxy rewrite to backend API
 │   └── vite.config.ts
 ├── .env.example
 └── README.md
@@ -156,4 +187,13 @@ Lingualead/
 ---
 
 ## 📄 License
-MIT License
+
+MIT License — free to use, modify, and learn from.
+
+---
+
+<div align="center">
+
+Built by **[Muhammad Moiz](https://github.com/moizmalik13588)** as part of an AI-agents portfolio.
+
+</div>

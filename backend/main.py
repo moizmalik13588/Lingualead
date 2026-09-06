@@ -36,28 +36,17 @@ def startup_event():
         traceback.print_exc()
         raise e
 
-from fastapi import Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 
-@app.middleware("http")
-async def add_cors_headers(request: Request, call_next):
-    origin = request.headers.get("origin")
-    if request.method == "OPTIONS":
-        response = Response()
-    else:
-        response = await call_next(request)
-
-    if origin and (
-        origin.endswith(".vercel.app") or 
-        "localhost" in origin or 
-        "127.0.0.1" in origin or
-        origin in settings.CORS_ORIGINS
-    ):
-        response.headers["Access-Control-Allow-Origin"] = origin
-        response.headers["Access-Control-Allow-Credentials"] = "true"
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-        response.headers["Access-Control-Allow-Headers"] = "*"
-
-    return response
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origin_regex=r"https://([a-z0-9-]+\.)*vercel\.app",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Include Routers
 app.include_router(vapi_router)

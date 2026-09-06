@@ -6,6 +6,7 @@ from app.services.vapi_service import VapiService
 
 async def verify_vapi_webhook(
     request: Request,
+    authorization: Optional[str] = Header(None, alias="Authorization"),
     x_vapi_secret: Optional[str] = Header(None, alias="X-Vapi-Secret"),
     x_vapi_signature: Optional[str] = Header(None, alias="X-Vapi-Signature"),
 ) -> bool:
@@ -16,7 +17,15 @@ async def verify_vapi_webhook(
     if not settings.VAPI_WEBHOOK_SECRET:
         return True
 
-    signature = x_vapi_secret or x_vapi_signature
+    # Extract token from Authorization Bearer header if present
+    auth_secret = None
+    if authorization:
+        if authorization.startswith("Bearer "):
+            auth_secret = authorization[7:]
+        else:
+            auth_secret = authorization
+
+    signature = auth_secret or x_vapi_secret or x_vapi_signature
     body = await request.body()
 
     is_valid = VapiService.verify_signature(signature, body, settings.VAPI_WEBHOOK_SECRET)

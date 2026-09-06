@@ -38,8 +38,9 @@ Extract structured information and return ONLY valid JSON matching this exact sc
 }}
 
 Qualification criteria:
-- HOT: Immediate buyer, high budget, urgent timeline (within days), explicit intent.
-- WARM: Interested, moderate budget/timeline (weeks/months), asking relevant questions.
+- HOT: Immediate buyer, high budget, urgent timeline (within days/weeks), explicit intent. 
+  CRITICAL RULE: Any lead with a budget over $3,000 (or equivalent currency like 300k+ PKR) AND a timeline within 1 month MUST be automatically classified as 'HOT'.
+- WARM: Interested, moderate budget/timeline, asking relevant questions.
 - COLD: Just browsing, no budget, unclear timeline, or uninterested.
 
 Transcript:
@@ -90,7 +91,7 @@ Transcript:
         
         # Heuristic qualification
         qualification = "warm"
-        if any(w in lower_text for w in ["urgent", "ready", "buy", "price", "kitna", "jaldi", "immediately"]):
+        if any(w in lower_text for w in ["urgent", "ready", "buy", "price", "kitna", "jaldi", "immediately", "3,000", "4,000", "5,000", "6,000", "3k", "5k", "weeks", "week", "days", "soon"]):
             qualification = "hot"
         elif any(w in lower_text for w in ["not sure", "thinking", "maybe", "bad mein", "sochenge"]):
             qualification = "cold"

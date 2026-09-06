@@ -15,7 +15,12 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str = Field(default_factory=lambda: os.getenv("GROQ_API_KEY", ""))
     ENVIRONMENT: str = Field(default_factory=lambda: os.getenv("ENVIRONMENT", "development"))
     PORT: int = Field(default_factory=lambda: int(os.getenv("PORT", "8000")))
-    CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:3000"]
+    CORS_ORIGINS: List[str] = [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://frontend-3rjaotrud-ms1699804-7207.vercel.app",
+        "https://frontend-beta-amber-s2mrth6g7n.vercel.app",
+    ]
 
     model_config = SettingsConfigDict(
         env_file=os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../.env")),

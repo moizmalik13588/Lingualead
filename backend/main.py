@@ -53,10 +53,10 @@ async def add_cors_headers(request: Request, call_next):
         "127.0.0.1" in origin or
         origin in settings.CORS_ORIGINS
     ):
-        response.headers["Access-Control-Allow-Origin"] = origin
-        response.headers["Access-Control-Allow-Credentials"] = "true"
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-        response.headers["Access-Control-Allow-Headers"] = "*"
+        response.headers["access-control-allow-origin"] = origin
+        response.headers["access-control-allow-credentials"] = "true"
+        response.headers["access-control-allow-methods"] = "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+        response.headers["access-control-allow-headers"] = "*"
 
     return response
 

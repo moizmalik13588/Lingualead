@@ -20,16 +20,21 @@ app = FastAPI(
 
 @app.on_event("startup")
 def startup_event():
+    import traceback
     try:
+        print(f"Connecting to database URL: {settings.DATABASE_URL[:30]}...")
         Base.metadata.create_all(bind=engine)
         db = SessionLocal()
         lead_count = db.query(Lead).count()
         db.close()
+        print(f"Database connected successfully. Lead count: {lead_count}")
         if lead_count == 0:
             print("Database is empty on startup. Auto-seeding demo data...")
             seed_database(reset=False)
     except Exception as e:
-        print(f"Startup database initialization error: {e}")
+        print(f"CRITICAL: Startup database initialization error: {e}")
+        traceback.print_exc()
+        raise e
 
 # Configure CORS
 app.add_middleware(

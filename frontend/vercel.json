@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://stellar-motivation-production-f6af.up.railway.app/api/:path*"
+    }
+  ]
+}

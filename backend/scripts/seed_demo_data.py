@@ -12,16 +12,17 @@ from app.models.call import Call, QualificationScoreEnum
 from app.models.follow_up import FollowUp
 
 
-def seed_database():
+def seed_database(reset: bool = False):
     print("Seeding LinguaLead database with demo data...")
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
 
-    # Clear existing data if any (optional, or check if already seeded)
-    existing_leads_count = db.query(Lead).count()
-    if existing_leads_count > 0:
-        print(f"Database already has {existing_leads_count} leads. Appending demo data or skipping...")
-        # Let's add demo leads if not present
+    if reset or "--reset" in sys.argv:
+        print("Resetting database (clearing existing leads, calls, follow-ups)...")
+        db.query(FollowUp).delete()
+        db.query(Call).delete()
+        db.query(Lead).delete()
+        db.commit()
 
     demo_leads_data = [
         {
@@ -31,17 +32,17 @@ def seed_database():
             "status": LeadStatusEnum.hot,
             "calls": [
                 {
-                    "transcript": "AI Agent: Hello! Welcome to LinguaLead. English mein baat karein ya Urdu mein? Sarah: Hi, English please. I'm interested in your AI voice calling agent for our real estate firm. We need inbound lead qualification immediately. Budget is $3,500/month, timeline is next week.",
-                    "summary": "Sarah Jenkins interested in AI voice calling agent for real estate firm. Budget $3.5k/mo, timeline next week.",
+                    "transcript": "AI Agent: Hello! Welcome to LinguaLead. English mein baat karein ya Urdu mein? Sarah: Hi, English please. I'm extremely interested in deploying your AI voice calling agent for our real estate firm across 3 offices. We need inbound lead qualification ready to start immediately this week. Budget is $6,500, timeline is urgent within 5 days.",
+                    "summary": "Sarah Jenkins wants AI voice calling agent for real estate firm across 3 offices. High budget $6,500, urgent timeline within 5 days.",
                     "qualification_score": QualificationScoreEnum.hot,
-                    "duration_seconds": 78,
+                    "duration_seconds": 85,
                     "language": LanguageEnum.english,
                     "hours_ago": 2,
                 }
             ],
             "follow_ups": [
                 {
-                    "notes": "Send enterprise pricing proposal and schedule Zoom demo with Sarah.",
+                    "notes": "Send enterprise contract and schedule onboarding call with Sarah Jenkins.",
                     "scheduled_hours_from_now": 22,
                     "completed": False,
                 }
@@ -54,17 +55,17 @@ def seed_database():
             "status": LeadStatusEnum.hot,
             "calls": [
                 {
-                    "transcript": "AI Agent: Hello! Welcome to LinguaLead. English mein baat karein ya Urdu mein? Ahmed Raza: Bhai Urdu mein baat karte hain. Mujhe apni auto parts store ke liye AI receptionist chahiye jo Urdu aur English dono mein calls attend kare. Budget 60 hazaar rupay mahina hai.",
-                    "summary": "Ahmed Raza wants bilingual AI receptionist for auto parts store in Urdu. Budget 60k PKR/month.",
+                    "transcript": "AI Agent: Hello! Welcome to LinguaLead. English mein baat karein ya Urdu mein? Ahmed Raza: Bhai Urdu mein baat karte hain. Mujhe apni chain of auto parts stores ke liye AI receptionist chahiye jo Urdu aur English dono mein 24/7 calls attend kare. Budget 6 lakh rupay mahina hai aur humein fauran agle do din mein setup chahiye.",
+                    "summary": "Ahmed Raza wants bilingual AI receptionist for auto parts store chain in Urdu. High budget 600,000 PKR/month, urgent setup within 2 days.",
                     "qualification_score": QualificationScoreEnum.hot,
-                    "duration_seconds": 95,
+                    "duration_seconds": 110,
                     "language": LanguageEnum.urdu,
                     "hours_ago": 5,
                 }
             ],
             "follow_ups": [
                 {
-                    "notes": "Call Ahmed back to discuss Urdu speech model tuning and integration timeline.",
+                    "notes": "Call Ahmed Raza to finalize Urdu voice model configuration and payment terms.",
                     "scheduled_hours_from_now": 19,
                     "completed": False,
                 }
@@ -88,7 +89,7 @@ def seed_database():
             "follow_ups": [
                 {
                     "notes": "Send case studies on customer support AI automation.",
-                    "scheduled_hours_from_now": 2,
+                    "scheduled_hours_from_now": 12,
                     "completed": False,
                 }
             ]
@@ -111,8 +112,8 @@ def seed_database():
             "follow_ups": [
                 {
                     "notes": "Follow up with Fatima regarding clinic discount package.",
-                    "scheduled_hours_from_now": -4, # Past due or completed
-                    "completed": True,
+                    "scheduled_hours_from_now": 36,
+                    "completed": False,
                 }
             ]
         },
@@ -137,7 +138,7 @@ def seed_database():
             "name": "Zainab Malik",
             "phone": "+923337778899",
             "language": LanguageEnum.urdu,
-            "status": LeadStatusEnum.new,
+            "status": LeadStatusEnum.cold,
             "calls": [
                 {
                     "transcript": "AI Agent: Hello! Welcome to LinguaLead. English mein baat karein ya Urdu mein? Zainab: Hello, mujhe thori information chahiye thi. (Call disconnected before details).",
@@ -153,21 +154,27 @@ def seed_database():
     ]
 
     for lead_data in demo_leads_data:
-        # Check if lead already exists
         existing_lead = db.query(Lead).filter(Lead.phone == lead_data["phone"]).first()
         if existing_lead:
-            print(f"Lead {lead_data['name']} already exists. Skipping...")
-            continue
-
-        lead = Lead(
-            name=lead_data["name"],
-            phone=lead_data["phone"],
-            language=lead_data["language"],
-            status=lead_data["status"],
-            created_at=datetime.utcnow() - timedelta(hours=30),
-        )
-        db.add(lead)
-        db.flush()
+            print(f"Updating existing lead: {lead_data['name']}...")
+            existing_lead.name = lead_data["name"]
+            existing_lead.language = lead_data["language"]
+            existing_lead.status = lead_data["status"]
+            lead = existing_lead
+            # Clear old calls for clean seeding
+            db.query(Call).filter(Call.lead_id == lead.id).delete()
+            db.query(FollowUp).filter(FollowUp.lead_id == lead.id).delete()
+        else:
+            print(f"Creating new lead: {lead_data['name']}...")
+            lead = Lead(
+                name=lead_data["name"],
+                phone=lead_data["phone"],
+                language=lead_data["language"],
+                status=lead_data["status"],
+                created_at=datetime.utcnow() - timedelta(hours=30),
+            )
+            db.add(lead)
+            db.flush()
 
         for call_data in lead_data["calls"]:
             call = Call(
@@ -192,8 +199,9 @@ def seed_database():
 
     db.commit()
     db.close()
-    print("Demo data successfully seeded into database!")
+    print("Demo data successfully seeded into database with guaranteed Hot leads!")
 
 
 if __name__ == "__main__":
-    seed_database()
+    reset_flag = "--reset" in sys.argv
+    seed_database(reset=reset_flag)

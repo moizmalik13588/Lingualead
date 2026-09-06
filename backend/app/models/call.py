@@ -18,6 +18,7 @@ class Call(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     lead_id = Column(Integer, ForeignKey("leads.id", ondelete="CASCADE"), nullable=False, index=True)
+    vapi_call_id = Column(String, unique=True, index=True, nullable=True)
     transcript = Column(Text, nullable=True)
     summary = Column(Text, nullable=True)
     qualification_score = Column(Enum(QualificationScoreEnum), nullable=True)

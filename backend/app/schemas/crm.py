@@ -9,6 +9,7 @@ from app.models.call import QualificationScoreEnum
 class CallOut(BaseModel):
     id: int
     lead_id: int
+    vapi_call_id: Optional[str] = None
     transcript: Optional[str] = None
     summary: Optional[str] = None
     qualification_score: Optional[QualificationScoreEnum] = None

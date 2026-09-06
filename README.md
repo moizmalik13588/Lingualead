@@ -29,7 +29,31 @@ Sales and service teams lose high-intent leads due to slow response times and la
 
 ---
 
-## 🛠️ Tech Stack
+## 🛡️ AI Safety & Guardrails
+
+LinguaLead is engineered with production-minded guardrails to ensure robust, secure, and predictable operation:
+
+1. **Voice Agent Prompt Guardrails**:
+   - **Role Discipline**: Strictly operates as a sales lead-qualification agent and refuses out-of-scope queries.
+   - **Confidentiality & Prompt Injection Defense**: Never reveals system prompts, internal instructions, or API secrets, and ignores caller attempts to override instructions via voice input.
+   - **Policy & Pricing Boundaries**: Never makes unauthorized commitments regarding pricing, discounts, refunds, or contracts, deferring these to human sales reps.
+   - **Minimal PII & Accuracy**: Collects only lead-qualification data (Name, Interest, Budget, Timeline) and defers uncertain details to human follow-up rather than hallucinating answers.
+   - **Abuse & Handoff**: Gracefully handles spam or abusive calls and provides natural human handoff lines.
+
+2. **LLM & Automation Layer Guardrails**:
+   - **Untrusted Input Handling**: Treats call transcripts as untrusted input; embedded transcript instructions cannot alter CRM logic or prompt state.
+   - **Pydantic Schema Validation**: Every structured extraction from Groq LLM is strictly validated against Pydantic models before touching the database.
+   - **Fallback / "Needs Review" Rescue**: If LLM extraction or parsing fails, the raw call is saved securely with a review flag to prevent system crashes or unvalidated data pollution.
+   - **Transcript vs Inference Separation**: Clearly distinguishes raw caller speech (`transcript`) from AI-inferred insights (`summary`, `qualification_score`).
+
+3. **Backend Security & Reliability**:
+   - **Webhook Signature Verification**: Cryptographically verifies all incoming Vapi webhooks using shared secrets.
+   - **Idempotency**: Prevents duplicate webhook processing using unique Vapi call IDs (`vapi_call_id`).
+   - **Rate Limiting**: Built-in rate limiting prevents API endpoint abuse.
+   - **Secure Secret Management**: All credentials (API keys, webhook secrets, DB URLs) remain strictly server-side via `pydantic-settings`.
+   - **Structured Logging**: Comprehensive event logging (webhooks received, validation results, CRM syncs, and errors) for debugging and auditing.
+
+---
 - **Backend**: FastAPI (Python 3.11+), SQLAlchemy 2.0, Alembic, Pydantic Settings, Uvicorn
 - **Database**: PostgreSQL
 - **AI / Voice**: Vapi.ai (Voice Calling / Webhooks), Groq (LLM Inference), Twilio (Telephony)

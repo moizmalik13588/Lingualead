@@ -33,6 +33,19 @@ class CRMService:
         call_id = parsed_vapi_data.get("call_id")
 
         try:
+            # Idempotency check using Vapi call ID
+            if call_id:
+                existing_call = db.query(Call).filter(Call.vapi_call_id == call_id).first()
+                if existing_call:
+                    logger.info(f"Duplicate webhook received for call_id {call_id}. Skipping processing (idempotent).")
+                    return {
+                        "success": True,
+                        "duplicate": True,
+                        "message": "Call already processed",
+                        "lead_id": existing_call.lead_id,
+                        "call_id": existing_call.id,
+                    }
+
             # 1. Determine Lead details from LLM extraction or Vapi payload
             if llm_extraction:
                 lead_name = llm_extraction.leadName if llm_extraction.leadName != "Unknown" else caller_name
@@ -90,6 +103,7 @@ class CRMService:
             # 3. Create Call record linked to lead
             call = Call(
                 lead_id=lead.id,
+                vapi_call_id=call_id,
                 transcript=transcript,
                 summary=call_summary,
                 qualification_score=call_score,
@@ -151,6 +165,7 @@ class CRMService:
 
                 rescue_call = Call(
                     lead_id=fallback_lead.id,
+                    vapi_call_id=call_id,
                     transcript=transcript,
                     summary=f"[ERROR/REVIEW REQUIRED] {summary} | Error: {str(e)}",
                     qualification_score=QualificationScoreEnum.warm,

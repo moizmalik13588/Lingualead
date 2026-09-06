@@ -1,6 +1,7 @@
 import type { LeadListItem, LeadDetail, FollowUp, DashboardStats, AIInsightsOut } from './types';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://stellar-motivation-production-f6af.up.railway.app/api';
+const rawBase = import.meta.env.VITE_API_BASE_URL || 'https://stellar-motivation-production-f6af.up.railway.app';
+const API_BASE = rawBase.endsWith('/api') ? rawBase : `${rawBase.replace(/\/+$/, '')}/api`;
 
 export async function fetchDashboardStats(): Promise<DashboardStats> {
   const res = await fetch(`${API_BASE}/dashboard/stats`);

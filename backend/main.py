@@ -36,24 +36,14 @@ def startup_event():
         traceback.print_exc()
         raise e
 
-from fastapi import Request, Response
-
-# Configure Dynamic CORS Middleware that reflects any requesting Origin
-@app.middleware("http")
-async def add_cors_headers(request: Request, call_next):
-    origin = request.headers.get("origin")
-    if request.method == "OPTIONS":
-        response = Response(status_code=200)
-    else:
-        response = await call_next(request)
-
-    if origin:
-        response.headers["access-control-allow-origin"] = origin
-        response.headers["access-control-allow-credentials"] = "true"
-        response.headers["access-control-allow-methods"] = "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-        response.headers["access-control-allow-headers"] = "*"
-
-    return response
+# Configure standard FastAPI CORSMiddleware with wildcard origins
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Include Routers
 app.include_router(vapi_router)

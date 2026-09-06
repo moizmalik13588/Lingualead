@@ -2,9 +2,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
+from app.core.database import engine, SessionLocal
+from app.models import Base
+from app.models.lead import Lead
 from app.api.routes.vapi import router as vapi_router
 from app.api.routes.crm import router as crm_router
 from app.api.routes.demo import router as demo_router
+from scripts.seed_demo_data import seed_database
 
 app = FastAPI(
     title="LinguaLead API",
@@ -13,6 +17,19 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
 )
+
+@app.on_event("startup")
+def startup_event():
+    try:
+        Base.metadata.create_all(bind=engine)
+        db = SessionLocal()
+        lead_count = db.query(Lead).count()
+        db.close()
+        if lead_count == 0:
+            print("Database is empty on startup. Auto-seeding demo data...")
+            seed_database(reset=False)
+    except Exception as e:
+        print(f"Startup database initialization error: {e}")
 
 # Configure CORS
 app.add_middleware(

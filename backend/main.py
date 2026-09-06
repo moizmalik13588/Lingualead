@@ -38,7 +38,7 @@ def startup_event():
 
 from fastapi import Request, Response
 
-# Configure Custom CORS Middleware for Vercel & Local Development
+# Configure Dynamic CORS Middleware that reflects any requesting Origin
 @app.middleware("http")
 async def add_cors_headers(request: Request, call_next):
     origin = request.headers.get("origin")
@@ -47,12 +47,7 @@ async def add_cors_headers(request: Request, call_next):
     else:
         response = await call_next(request)
 
-    if origin and (
-        origin.endswith(".vercel.app") or 
-        "localhost" in origin or 
-        "127.0.0.1" in origin or
-        origin in settings.CORS_ORIGINS
-    ):
+    if origin:
         response.headers["access-control-allow-origin"] = origin
         response.headers["access-control-allow-credentials"] = "true"
         response.headers["access-control-allow-methods"] = "GET, POST, PUT, DELETE, PATCH, OPTIONS"

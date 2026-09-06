@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
@@ -15,6 +15,8 @@ from app.schemas.crm import (
     CallOut,
     FollowUpOut,
     DashboardStatsOut,
+    AIInsightItem,
+    AIInsightsOut,
 )
 
 logger = logging.getLogger(__name__)
@@ -238,4 +240,79 @@ def get_dashboard_stats(db: Session = Depends(get_db)):
         pending_follow_ups_count=pending_follow_ups_count,
         recent_calls=recent_calls,
         recent_leads=recent_leads,
+    )
+
+
+@router.get("/dashboard/ai-insights", response_model=AIInsightsOut)
+def get_dashboard_ai_insights(db: Session = Depends(get_db)):
+    """
+    Compute actionable AI assistant insights directly from database records:
+    - Overdue follow-ups
+    - Hot/warm leads missing a scheduled follow-up
+    - New hot leads in the last 7 days
+    """
+    now = datetime.utcnow()
+    insights = []
+    
+    # 1. Overdue follow-ups
+    overdue_fus = db.query(FollowUp).filter(
+        FollowUp.completed == False,
+        FollowUp.scheduled_for < now
+    ).all()
+    for fu in overdue_fus:
+        lead = db.query(Lead).filter(Lead.id == fu.lead_id).first()
+        lead_name = lead.name if lead else "Lead"
+        insights.append(
+            AIInsightItem(
+                id=f"overdue-{fu.id}",
+                title="Overdue Follow-up",
+                message=f"Follow-up with {lead_name} was scheduled for {fu.scheduled_for.strftime('%b %d, %H:%M')} and is overdue.",
+                timestamp=fu.scheduled_for,
+                category="overdue"
+            )
+        )
+
+    # 2. Hot/warm leads with no pending follow-up
+    active_leads = db.query(Lead).filter(
+        Lead.status.in_([LeadStatusEnum.hot, LeadStatusEnum.warm])
+    ).all()
+    for lead in active_leads:
+        pending_fu = db.query(FollowUp).filter(
+            FollowUp.lead_id == lead.id,
+            FollowUp.completed == False
+        ).first()
+        if not pending_fu:
+            insights.append(
+                AIInsightItem(
+                    id=f"nofu-{lead.id}",
+                    title=f"{lead.status.value.capitalize()} Lead Unassigned",
+                    message=f"{lead.name} ({lead.phone}) is marked {lead.status.value} with no active follow-up scheduled.",
+                    timestamp=lead.created_at,
+                    category="no_followup"
+                )
+            )
+
+    # 3. New hot leads in last 7 days
+    week_ago = now - timedelta(days=7)
+    recent_hot = db.query(Lead).filter(
+        Lead.status == LeadStatusEnum.hot,
+        Lead.created_at >= week_ago
+    ).all()
+    for lead in recent_hot:
+        insights.append(
+            AIInsightItem(
+                id=f"hotlead-{lead.id}",
+                title="High-Intent Hot Lead",
+                message=f"New hot lead acquired: {lead.name} in {lead.language.value.capitalize()} market. Ready for close.",
+                timestamp=lead.created_at,
+                category="hot_lead"
+            )
+        )
+
+    # Sort insights by timestamp desc
+    insights.sort(key=lambda x: x.timestamp, reverse=True)
+
+    return AIInsightsOut(
+        insights=insights[:6],
+        generated_at=now
     )

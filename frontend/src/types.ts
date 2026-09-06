@@ -49,3 +49,16 @@ export interface DashboardStats {
   recent_calls: Call[];
   recent_leads: LeadListItem[];
 }
+
+export interface AIInsightItem {
+  id: string;
+  title: string;
+  message: string;
+  timestamp: string;
+  category: string;
+}
+
+export interface AIInsightsOut {
+  insights: AIInsightItem[];
+  generated_at: string;
+}

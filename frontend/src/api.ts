@@ -1,4 +1,4 @@
-import type { LeadListItem, LeadDetail, FollowUp, DashboardStats } from './types';
+import type { LeadListItem, LeadDetail, FollowUp, DashboardStats, AIInsightsOut } from './types';
 
 const API_BASE = 'http://localhost:8000/api';
 
@@ -58,5 +58,11 @@ export async function simulateWebhook(language: string): Promise<any> {
     const errData = await res.json().catch(() => ({}));
     throw new Error(errData.detail || 'Failed to simulate call');
   }
+  return res.json();
+}
+
+export async function fetchAIInsights(): Promise<AIInsightsOut> {
+  const res = await fetch(`${API_BASE}/dashboard/ai-insights`);
+  if (!res.ok) throw new Error('Failed to fetch AI insights');
   return res.json();
 }

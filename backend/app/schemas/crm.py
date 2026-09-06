@@ -71,3 +71,17 @@ class DashboardStatsOut(BaseModel):
     pending_follow_ups_count: int
     recent_calls: List[CallOut] = []
     recent_leads: List[LeadListItem] = []
+
+
+class AIInsightItem(BaseModel):
+    id: str
+    title: str
+    message: str
+    timestamp: datetime
+    category: str
+
+
+class AIInsightsOut(BaseModel):
+    insights: List[AIInsightItem]
+    generated_at: datetime
+

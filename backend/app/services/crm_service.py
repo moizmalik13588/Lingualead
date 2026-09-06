@@ -83,7 +83,7 @@ class CRMService:
             lead = db.query(Lead).filter(Lead.phone == lead_phone).first()
 
             if lead:
-                # Update existing lead name/status if appropriate
+                # Update existing lead name/status to reflect the latest call qualification
                 if lead_name and lead_name != "Unknown Caller":
                     lead.name = lead_name
                 lead.status = lead_status
@@ -112,7 +112,7 @@ class CRMService:
             )
             db.add(call)
 
-            # 4. If qualification is 'hot' or 'warm', auto-create a FollowUp record scheduled for 24 hours later
+            # 4. If qualification is 'hot' or 'warm', update existing incomplete follow-up or create a new one
             follow_up_created = False
             if lead_status in [LeadStatusEnum.hot, LeadStatusEnum.warm]:
                 scheduled_time = datetime.utcnow() + timedelta(hours=24)
@@ -122,14 +122,25 @@ class CRMService:
                     else f"Follow up with {lead_name} regarding recent inquiry."
                 )
                 
-                follow_up = FollowUp(
-                    lead_id=lead.id,
-                    scheduled_for=scheduled_time,
-                    notes=follow_up_notes,
-                    completed=False,
-                )
-                db.add(follow_up)
-                follow_up_created = True
+                # Check if lead already has an incomplete, unactioned FollowUp
+                existing_fu = db.query(FollowUp).filter(
+                    FollowUp.lead_id == lead.id,
+                    FollowUp.completed == False
+                ).first()
+
+                if existing_fu:
+                    existing_fu.scheduled_for = scheduled_time
+                    existing_fu.notes = follow_up_notes
+                    follow_up_created = True
+                else:
+                    follow_up = FollowUp(
+                        lead_id=lead.id,
+                        scheduled_for=scheduled_time,
+                        notes=follow_up_notes,
+                        completed=False,
+                    )
+                    db.add(follow_up)
+                    follow_up_created = True
 
             db.commit()
             db.refresh(lead)

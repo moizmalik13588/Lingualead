@@ -63,7 +63,7 @@ export const FollowUpsPage: React.FC<FollowUpsPageProps> = ({ onSelectLead }) =>
       {/* Follow-Ups List */}
       {loading ? (
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-purple-600 border-t-transparent"></div>
         </div>
       ) : followUps.length === 0 ? (
         <div className="bg-white rounded-2xl p-12 text-center border border-gray-100">

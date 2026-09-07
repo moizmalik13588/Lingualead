@@ -114,7 +114,7 @@ export const LeadsPage: React.FC<LeadsPageProps> = ({ onSelectLead }) => {
       {/* Leads Table (Desktop) & Cards (Mobile) */}
       {loading ? (
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-purple-600 border-t-transparent"></div>
         </div>
       ) : leads.length === 0 ? (
         <div className="bg-white rounded-2xl p-12 text-center border border-gray-100">
@@ -179,7 +179,7 @@ export const LeadsPage: React.FC<LeadsPageProps> = ({ onSelectLead }) => {
                           e.stopPropagation();
                           onSelectLead(lead.id);
                         }}
-                        className="px-3 py-1.5 rounded-lg bg-gray-50 text-gray-600 group-hover:bg-purple-600 group-hover:text-white transition text-xs font-semibold"
+                        className="px-3 py-1.5 rounded-lg bg-purple-50 text-purple-700 group-hover:bg-purple-600 group-hover:text-white transition text-xs font-semibold"
                       >
                         View Details
                       </button>

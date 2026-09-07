@@ -19,11 +19,11 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('dashboard')}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-purple-500/20">
+            <div className="w-10 h-10 rounded-xl bg-purple-600 flex items-center justify-center text-white shadow-md shadow-purple-500/20">
               <PhoneCall className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-purple-900 bg-clip-text text-transparent">
+              <span className="text-xl font-bold tracking-tight text-gray-900">
                 LinguaLead
               </span>
               <span className="hidden sm:inline-block ml-2 px-2 py-0.5 text-xs font-semibold bg-purple-50 text-purple-700 rounded-full border border-purple-100">

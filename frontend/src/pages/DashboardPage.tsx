@@ -30,7 +30,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   if (loading || !stats) {
     return (
       <div className="flex justify-center items-center h-96">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-purple-600 border-t-transparent"></div>
       </div>
     );
   }
@@ -233,7 +233,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                             e.stopPropagation();
                             onSelectLead(lead.id);
                           }}
-                          className="p-2 rounded-xl text-gray-400 hover:text-purple-600 hover:bg-purple-50 transition"
+                          className="p-2 rounded-xl text-purple-600 hover:text-purple-700 hover:bg-purple-50 transition"
                         >
                           <ChevronRight className="w-4 h-4" />
                         </button>
@@ -299,7 +299,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             <div className="space-y-4 flex-1 overflow-y-auto max-h-[700px] pr-1">
               {insightsLoading ? (
                 <div className="flex justify-center py-12">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
+                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-purple-600 border-t-transparent"></div>
                 </div>
               ) : aiInsights.length === 0 ? (
                 <div className="text-center py-12 px-4 bg-purple-50/30 rounded-2xl border border-purple-100/50 space-y-2">

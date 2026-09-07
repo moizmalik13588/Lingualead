@@ -38,7 +38,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] text-gray-900 font-sans selection:bg-purple-500 selection:text-white">
+    <div className="min-h-screen bg-[#f8f9fc] text-gray-900 font-sans">
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">

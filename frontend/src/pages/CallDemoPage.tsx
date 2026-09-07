@@ -61,7 +61,7 @@ export const CallDemoPage: React.FC<CallDemoPageProps> = ({ onSelectLead, setAct
             className="w-full py-3 rounded-xl bg-purple-600 text-white font-semibold text-sm hover:bg-purple-500 transition shadow-md shadow-purple-500/20 flex items-center justify-center space-x-2 disabled:opacity-50"
           >
             {simulating ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
             ) : (
               <>
                 <Play className="w-4 h-4 fill-current" />
@@ -91,7 +91,7 @@ export const CallDemoPage: React.FC<CallDemoPageProps> = ({ onSelectLead, setAct
             className="w-full py-3 rounded-xl bg-purple-600 text-white font-semibold text-sm hover:bg-purple-500 transition shadow-md shadow-purple-500/20 flex items-center justify-center space-x-2 disabled:opacity-50"
           >
             {simulating ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
             ) : (
               <>
                 <Play className="w-4 h-4 fill-current" />

@@ -1,0 +1,11 @@
+# Exclude generated/config files from GitHub language stats
+frontend/package-lock.json linguist-generated=true
+frontend/tsconfig.json linguist-generated=true
+frontend/tsconfig.app.json linguist-generated=true
+frontend/tsconfig.node.json linguist-generated=true
+frontend/vite.config.ts linguist-generated=true
+frontend/tailwind.config.js linguist-generated=true
+frontend/postcss.config.js linguist-generated=true
+frontend/eslint.config.js linguist-generated=true
+*.config.js linguist-generated=true
+*.config.ts linguist-generated=true
